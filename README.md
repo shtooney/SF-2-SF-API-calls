@@ -1,5 +1,5 @@
 # SF-2-SF-API-calls
-##### Great way to show the openness of the Platform by having 2 different Salesforce orgs talk to each other!
+##### Enjoy openness of the Platform by having 2 different Salesforce orgs talk to each other!
 
 1. **Step 1:** Sign up for 2 different Developer orgs (so do it twice): https://developer.salesforce.com/signup
 2. **Step 2:** Set up Connected App in Org 1
