@@ -1,0 +1,40 @@
+/** 
+ * We are creating a URL mapping in the line below, which will end with /IntegrationExample/ in our URL
+ * So that our endpoint is https://na34.salesforce.com/services/apexrest/IntegrationExample/
+ * This will be your Pod (such as "na34" above) with rest of endpoint URL above or your custom domain
+ */
+@RestResource(urlMapping='/IntegrationExample/*')
+
+/**
+ * We are going to have our message interact with a Salesforce Object
+ * In this case, please quickly create an Example object, auto-increment it, 
+ * and give it 1 field called Test. 
+ * We will be refencing Example__c object and Test__c in code below
+ */
+
+global with sharing class ExampleManager {
+  
+    @HttpGet
+    global static Example__c getExampleById() {
+        RestRequest req = RestContext.request;        
+        String exampleId = req.requestURI.substring(
+                                  req.requestURI.lastIndexOf('/')+1);
+        Example__c result = 
+                       [SELECT Id, Name, Test__c 
+                        FROM Example__c 
+                        WHERE Id = :exampleId];
+        return result;
+    }
+  
+    /** 
+     * Example of a POST that's coming from the original system
+     * We're just contactinating a string to signal it came from the other system
+	 */
+    @HttpPost
+    global static String createExample(String stringFromOtherSystem) {
+        Example__c e = new Example__c(
+            Test__c = stringFromOtherSystem + ' - this came from another system');
+        insert e;
+        return e.Name;
+    }
+}
