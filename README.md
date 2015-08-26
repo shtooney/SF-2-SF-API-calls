@@ -8,8 +8,8 @@
     * If you haven't set it up before: Go to Create >> Apps >> Click New under Connected Apps at the bottom. Put in your Connected App Name, API Name, Enable OAuth settings, Callback URL above, and select security parameters mentioned above 
 3. **Step 3:** Optional to play it safe: Set Remote Site Settings for each org of the org's URL - i.e., https://na34.salesforce.com	or your custom domains. If you haven't set it up before: Go to Security Controls >> Remote Site Settings >> and do New Remote Site
 4. **Step 4:** Review and provide code (with comments):
-    * Code Applicable for Org 1:
+    * _Code Applicable for Org 1:_
        * ExampleManager class
-    * Code Applicable for Org 2: 
+    * _Code Applicable for Org 2:_ 
        * Integrate class (with OAuth2 wrapper class)
        * TestShow page
