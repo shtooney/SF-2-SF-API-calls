@@ -1,0 +1,22 @@
+<apex:page controller="Integrate" id="pgId">
+<script>
+    function setHidden()
+    {
+        var hiddenValSave = document.getElementById('pgId:frmId:pgBlockId:hiddenStringChosen');
+        hiddenValSave.value = document.getElementById('stringChosen').value;
+    }
+</script>
+    <apex:form id="frmId">
+        <apex:pageMessages id="pgMsg"></apex:pageMessages>
+        <apex:pageBlock id="pgBlockId">
+           <div class="variable-entry">
+            <label for="stringChosen"><b>Pass this along: </b></label>
+            <input id="stringChosen"/>
+           </div>
+            <apex:inputHidden id="hiddenStringChosen" value="{!stringChosen}"/>    
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!simpleTest}" onclick="setHidden();" value="Save" rerender="pgMsg"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>
