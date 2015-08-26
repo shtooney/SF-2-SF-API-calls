@@ -1,0 +1,78 @@
+public with sharing class Integrate {	
+    
+    //Parameter(s) we'll get from our VF page, TestShow.vfp
+    public String stringChosen {get; set;}
+    
+    /** 
+     * Optional - Security Setting. Security Setting object was Integration__c. Will be useful a few lines down when declaring clientId, 
+     * clientSecret, username, password, etc - easier to store it in a custom setting too
+    */ 
+	public List<Integration__c> mySetting = [SELECT Id, clientId__c, clientSecret__c, password__c, token__c, username__c 
+                                  FROM Integration__c
+                                  WHERE Id = 'a0161000000kTrhAAE'];
+    public Integration__c mySettingParameters = mySetting[0];
+    
+    public void doIntegration(String anyStringExample){
+        
+		String clientId = mySettingParameters.clientId__c;
+		String clientSecret = mySettingParameters.clientSecret__c;
+		String username=mySettingParameters.username__c;
+		String password=mySettingParameters.password__c+mySettingParameters.token__c;
+    
+		String reqbody = 'grant_type=password&client_id='+clientId+'&client_secret='+clientSecret+'&username='+username+'&password='+password;
+  
+		// Most of below is instantiating HttpRequest, HttpResponce classes & etc
+        Http h = new Http();
+        HttpRequest req = new HttpRequest();
+        req.setBody(reqbody);
+        req.setMethod('POST');   
+        // This will be your Pod (such as "na34" below) with rest of endpoint URL below or your custom domain
+        req.setEndpoint('https://na34.salesforce.com/services/oauth2/token'); 
+    
+		// This will set us up for the next if-statement, in case there is no access token
+		HttpResponse res = h.send(req);  
+		OAuth2 objAuthenticationInfo = (OAuth2)JSON.deserialize(res.getbody(), OAuth2.class);
+        
+        // For cases if there is no access token
+        if(objAuthenticationInfo.access_token!=null){
+        
+            Http h1 = new Http();
+            HttpRequest req1 = new HttpRequest();
+            
+            req1.setHeader('Authorization','Bearer '+objAuthenticationInfo.access_token);
+            req1.setHeader('Content-Type','application/json');
+            req1.setHeader('accept','application/json');
+        
+            /**
+             * Here we're setting the body via JSON. We can use JSON serialization but
+             * We just put in the method variable to show we can pass any parameters in our methods
+			*/
+            req1.setBody('{"stringFromOtherSystem" : "'+ anyStringExample +'"}');
+            req1.setMethod('POST');
+			/** 
+			 * Note 1 for URL below: This will be your Pod (such as "na34" below) with rest of endpoint URL below or your custom domain
+			 * Note 2 for URL below: In addition, the IntegrationExample is a class in the endpoint (see IntegrationExample Apex class) 
+			 * Note 3 for URL below: the JSON format (i.e., stringFromOtherSystem in 2 lines of code above
+			 * needs to comply to what the receiving endpoint's class takes. Our receiving endpoint, IntegrationExample has a method that takes a string
+			 * called "stringFromOtherSystem" as a parameter - see createExample method in IntegrationExample class
+			 * */
+            req1.setEndpoint('https://na34.salesforce.com/services/apexrest/IntegrationExample/');
+            HttpResponse res1 = h1.send(req1);
+            system.debug('RESPONSE_BODY'+res1.getbody());
+            
+
+        }
+	}
+    
+    // Simple test taking the stringChosen param from TestShow.vfp.
+    // The addError method is simply used for providing info out for what you punched in
+    // The above class is called,
+    public PageReference simpleTest() 
+    {
+        new account().addError('Great, we\'ve passed this: '+ stringChosen);
+        Integrate intgr = new Integrate();
+		intgr.doIntegration(stringChosen);
+        return null;
+    }
+    
+}
